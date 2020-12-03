@@ -1,5 +1,6 @@
 --bat_n_ball final draft
-
+-- bird = bat
+--ball = gap
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
@@ -10,6 +11,7 @@ ENTITY bat_n_ball IS
 		v_sync : IN STD_LOGIC;
 		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+		hits: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
 		serve : IN STD_LOGIC; -- initiates serve
 		red : OUT STD_LOGIC;
@@ -33,12 +35,14 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
 	-- current ball position - intitialized to center of screen
 	SIGNAL gap_x : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
 	SIGNAL wall_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
-	-- bat vertical position
+	-- bird = bat  vertical position
 	CONSTANT bat_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
 	-- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
+	--boundary on the gap
 	SIGNAL wall_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := ball_speed;
 	SIGNAL x : integer :=320;
 	SIGNAL flag : integer :=0;
+	SIGNAL hitcount : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	--signal duck_x : integer := 115; --constant duck x position
     --signal duck_y : integer := 150; --initial duck y position
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
@@ -76,7 +80,7 @@ BEGIN
 	END PROCESS;
 	
 	--process to draw bat
-  --   set bat_on if current pixel address is covered by bat position
+    -- set bat_on if current pixel address is covered by bat position
 	batdraw : PROCESS (bat_x, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	
@@ -103,11 +107,12 @@ BEGIN
 			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 				game_on <= '1';
 				wall_y_motion <= (ball_speed); -- set vspeed to (- ball_speed) pixels
-			ELSIF wall_y + wall_h/2 >= 480 THEN -- if ball meets bottom wall
-			    IF flag=0 THEN
-			    score <= score+1;
-			    flag <=1;
-			    END IF;
+		--	ELSIF 
+			--wall_y + wall_h/2 >= 480 THEN -- if ball meets bottom wall
+			    --IF flag=0 THEN
+			   -- score <= score+1;
+			   -- flag <=1;
+			 -- END IF;
 			    --gapsize is decreased and speed is increased;
 			    --if '=' doesn't work try '<' and work from 5 to 15 to 25
 			    --IF score=5 THEN
@@ -140,7 +145,10 @@ BEGIN
 			 wall_y >= bat_y - bat_h/2 THEN
                 IF (bat_x + bat_w/2) <= (gap_x + gapsize/2) AND
                  (bat_x - bat_w/2) >= (gap_x - gapsize/2) Then
-                      
+                    score <= score+1;
+                    hitcount <= hitcount+1;
+                    hits <= hitcount; 
+                     -- ball_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
                      --(bat_y + bat_h/2) >= (wall_y - wall_h) AND
                      --(bat_y - bat_h/2) <= (wall_y + wall_h) THEN
                      --nothing, it's all good   
