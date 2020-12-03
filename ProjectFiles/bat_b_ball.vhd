@@ -1,6 +1,7 @@
 --bat_n_ball final draft
 -- bird = bat
---ball = gap
+-- ball = gap
+-- wall = bound
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
@@ -24,22 +25,22 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
 	SIGNAL gapsize : INTEGER := 120; -- gap size in pixels
 	CONSTANT bird_w : INTEGER := 6; -- bird width in pixels
 	CONSTANT bird_h : INTEGER := 6; -- bird height in pixels
-	CONSTANT wall_h : INTEGER := 65; -- thickness of the wall
-	SIGNAL score : integer :=0; -- score;+1for each wall passed
+	CONSTANT bound_h : INTEGER := 65; -- thickness of the bound
+	SIGNAL score : integer :=0; -- score;+1for each bound passed
 	-- distance gap moves each frame
 	SIGNAL gap_speed : STD_LOGIC_VECTOR (9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 10);
-	SIGNAL wall_on : STD_LOGIC; -- indicates whether wall is at current pixel position
+	SIGNAL bound_on : STD_LOGIC; -- indicates whether bound is at current pixel position
 	SIGNAL bird_on : STD_LOGIC; -- indicates whether bird at over current pixel position
 	signal building_on : std_logic;
 	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether gap is in play
 	-- current gap position - intitialized to center of screen
 	SIGNAL gap_pos : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
-	SIGNAL wall_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
+	SIGNAL bound_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
 	-- bird = bat  vertical position
 	CONSTANT bird_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
 	-- current gap motion - initialized to (+ gap_speed) pixels/frame in both X and Y directions
 	--boundary on the gap
-	SIGNAL wall_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := gap_speed;
+	SIGNAL bound_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := gap_speed;
 	SIGNAL x : integer :=320;
 	SIGNAL flag : integer :=0;
 	SIGNAL hitcount : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -48,31 +49,31 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
 BEGIN
 	red <= NOT bird_on;   -- color setup for red gap and cyan bird on white background	
-	green <= NOT wall_on;
-	blue <= NOT wall_on AND building_on;
+	green <= NOT bound_on;
+	blue <= NOT bound_on AND building_on;
 	-- process to draw gap
 	-- set gap_on if current pixel address is covered by ball position
-	gapdraw : PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
+	gapdraw : PROCESS (bound_y, gap_pos, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
         IF ((pixel_row >= gap_pos - gapsize/2) OR (gap_pos <= gapsize/2)) AND
 		 pixel_row <= gap_pos + gapsize/2 AND
-			 pixel_col >= wall_y - wall_h AND
-			 pixel_col <= wall_y + wall_h THEN
-				wall_on <= '1';
+			 pixel_col >= bound_y - bound_h AND
+			 pixel_col <= bound_y + bound_h THEN
+				bound_on <= '1';
 		ELSE
-			wall_on <= '0';
+			bound_on <= '0';
 		END IF;
 	END PROCESS;
 	
 	--process to draw the buildings
-	buldingdraw: PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
+	buldingdraw: PROCESS (bound_y, gap_pos, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
         IF ((pixel_row < gap_pos - gapsize/2) OR (gap_pos > gapsize/2)) AND
 		 pixel_row > gap_pos + gapsize/2 AND
-			 pixel_col >= wall_y - wall_h AND
-			 pixel_col <= wall_y + wall_h THEN
+			 pixel_col >= bound_y - bound_h AND
+			 pixel_col <= bound_y + bound_h THEN
 				building_on <= '1';
 		ELSE
 			building_on <= '0';
@@ -106,9 +107,9 @@ BEGIN
 			    gapsize<=120;
 			    gap_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 				game_on <= '1';
-				wall_y_motion <= (gap_speed); -- set vspeed to (- gap_speed) pixels
+				bound_y_motion <= (gap_speed); -- set vspeed to (- gap_speed) pixels
 		--	ELSIF 
-			--wall_y + wall_h/2 >= 480 THEN -- if gap meets bottom wall
+			--bound_y + bound_h/2 >= 480 THEN -- if gap meets bottom bound
 			    --IF flag=0 THEN
 			   -- score <= score+1;
 			   -- flag <=1;
@@ -125,7 +126,7 @@ BEGIN
 			    --    gapsize<=50;
 			    --    gap_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
 			    --END IF;
-			    --wall_y_motion<=gap_speed;
+			    --bound_y_motion<=gap_speed;
 			    --get a new x-position for the gap with each reset
 			    --x <=((abs(320-x))+(123*(score**2)) mod 560)+40;
 			    --trying without the initial abs(320-x);
@@ -137,29 +138,29 @@ BEGIN
 			    x <=600;
 			    END IF;
 			    gap_pos <= CONV_STD_LOGIC_VECTOR(x, 10);
-				wall_y <= CONV_STD_LOGIC_VECTOR(5, 10);
+				bound_y <= CONV_STD_LOGIC_VECTOR(5, 10);
 				flag<=0;
 			END IF;
 			-- landed within the gap
-			IF wall_y <= bird_y + bird_h/2 AND
-			 wall_y >= bird_y - bird_h/2 THEN
+			IF bound_y <= bird_y + bird_h/2 AND
+			 bound_y >= bird_y - bird_h/2 THEN
                 IF (bird_x + bird_w/2) <= (gap_pos + gapsize/2) AND
                  (bird_x - bird_w/2) >= (gap_pos - gapsize/2) Then
                     score <= score+1;
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
                      -- gap_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
-                     --(bird_y + bird_h/2) >= (wall_y - wall_h) AND
-                     --(bird_y - bird_h/2) <= (wall_y + wall_h) THEN
+                     --(bird_y + bird_h/2) >= (bound_y - bound_h) AND
+                     --(bird_y - bird_h/2) <= (bound_y + bound_h) THEN
                      --nothing, it's all good   
                 ELSE
-                -- hit the wall you lose
+                -- hit the bound you lose
            
                 game_on <= '0';
                 gap_pos <= CONV_STD_LOGIC_VECTOR(320, 10);
                 gapsize<=120;
 			    gap_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
-			    wall_y_motion<=gap_speed;
+			    bound_y_motion<=gap_speed;
 			    
                 END IF;
             END IF;
@@ -167,12 +168,12 @@ BEGIN
 			-- compute next gap vertical position
 			-- variable temp adds one more bit to calculation to fix unsigned underflow problems
 			-- when gap_y is close to zero and gap_y_motion is negative(This is not needed)
-			temp := ('0' & wall_y) + (wall_y_motion(9) & wall_y_motion);
+			temp := ('0' & bound_y) + (bound_y_motion(9) & bound_y_motion);
 			IF game_on = '0' THEN
-				wall_y <= CONV_STD_LOGIC_VECTOR(5, 10);
+				bound_y <= CONV_STD_LOGIC_VECTOR(5, 10);
 			ELSIF temp(10) = '1' THEN
-				wall_y <= (OTHERS => '0');
-			ELSE wall_y <= temp(9 DOWNTO 0);
+				bound_y <= (OTHERS => '0');
+			ELSE bound_y <= temp(9 DOWNTO 0);
 			END IF;
 			
 			END PROCESS;
