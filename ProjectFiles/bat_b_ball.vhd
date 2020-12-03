@@ -21,25 +21,25 @@ ENTITY bat_n_ball IS
 END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
-	SIGNAL gapsize : INTEGER := 120; -- ball size in pixels
+	SIGNAL gapsize : INTEGER := 120; -- gap size in pixels
 	CONSTANT bird_w : INTEGER := 6; -- bird width in pixels
 	CONSTANT bird_h : INTEGER := 6; -- bird height in pixels
 	CONSTANT wall_h : INTEGER := 65; -- thickness of the wall
 	SIGNAL score : integer :=0; -- score;+1for each wall passed
-	-- distance ball moves each frame
-	SIGNAL ball_speed : STD_LOGIC_VECTOR (9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 10);
+	-- distance gap moves each frame
+	SIGNAL gap_speed : STD_LOGIC_VECTOR (9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 10);
 	SIGNAL wall_on : STD_LOGIC; -- indicates whether wall is at current pixel position
 	SIGNAL bird_on : STD_LOGIC; -- indicates whether bird at over current pixel position
 	signal building_on : std_logic;
-	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether ball is in play
-	-- current ball position - intitialized to center of screen
+	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether gap is in play
+	-- current gap position - intitialized to center of screen
 	SIGNAL gap_pos : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
 	SIGNAL wall_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
 	-- bird = bat  vertical position
 	CONSTANT bird_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
-	-- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
+	-- current gap motion - initialized to (+ gap_speed) pixels/frame in both X and Y directions
 	--boundary on the gap
-	SIGNAL wall_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := ball_speed;
+	SIGNAL wall_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := gap_speed;
 	SIGNAL x : integer :=320;
 	SIGNAL flag : integer :=0;
 	SIGNAL hitcount : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -47,12 +47,12 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     --signal duck_y : integer := 150; --initial duck y position
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
 BEGIN
-	red <= NOT bird_on;   -- color setup for red ball and cyan bird on white background	
+	red <= NOT bird_on;   -- color setup for red gap and cyan bird on white background	
 	green <= NOT wall_on;
 	blue <= NOT wall_on AND building_on;
 	-- process to draw gap
-	-- set ball_on if current pixel address is covered by ball position
-	balldraw : PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
+	-- set gap_on if current pixel address is covered by ball position
+	gapdraw : PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
         IF ((pixel_row >= gap_pos - gapsize/2) OR (gap_pos <= gapsize/2)) AND
@@ -97,18 +97,18 @@ BEGIN
 	
 		
 		-- process to move ball once every frame (i.e. once every vsync pulse)
-		mball : PROCESS
+		mgap : PROCESS
 			VARIABLE temp : STD_LOGIC_VECTOR (10 DOWNTO 0);
 		BEGIN
 			WAIT UNTIL rising_edge(v_sync);
 			IF serve = '1' AND game_on = '0' THEN -- test for new serve
 			    score<=0;
 			    gapsize<=120;
-			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
+			    gap_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 				game_on <= '1';
-				wall_y_motion <= (ball_speed); -- set vspeed to (- ball_speed) pixels
+				wall_y_motion <= (gap_speed); -- set vspeed to (- gap_speed) pixels
 		--	ELSIF 
-			--wall_y + wall_h/2 >= 480 THEN -- if ball meets bottom wall
+			--wall_y + wall_h/2 >= 480 THEN -- if gap meets bottom wall
 			    --IF flag=0 THEN
 			   -- score <= score+1;
 			   -- flag <=1;
@@ -117,15 +117,15 @@ BEGIN
 			    --if '=' doesn't work try '<' and work from 5 to 15 to 25
 			    --IF score=5 THEN
 			    --    gapsize<=70;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
+			    --    gap_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
 			    --ELSIF score=15 THEN
 			    --    gapsize<=60;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
+			    --    gap_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 			    --ELSIF score=25 THEN
 			    --    gapsize<=50;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
+			    --    gap_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
 			    --END IF;
-			    --wall_y_motion<=ball_speed;
+			    --wall_y_motion<=gap_speed;
 			    --get a new x-position for the gap with each reset
 			    --x <=((abs(320-x))+(123*(score**2)) mod 560)+40;
 			    --trying without the initial abs(320-x);
@@ -148,7 +148,7 @@ BEGIN
                     score <= score+1;
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
-                     -- ball_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
+                     -- gap_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
                      --(bird_y + bird_h/2) >= (wall_y - wall_h) AND
                      --(bird_y - bird_h/2) <= (wall_y + wall_h) THEN
                      --nothing, it's all good   
@@ -158,15 +158,15 @@ BEGIN
                 game_on <= '0';
                 gap_pos <= CONV_STD_LOGIC_VECTOR(320, 10);
                 gapsize<=120;
-			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
-			    wall_y_motion<=ball_speed;
+			    gap_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
+			    wall_y_motion<=gap_speed;
 			    
                 END IF;
             END IF;
 			
-			-- compute next ball vertical position
+			-- compute next gap vertical position
 			-- variable temp adds one more bit to calculation to fix unsigned underflow problems
-			-- when ball_y is close to zero and ball_y_motion is negative(This is not needed)
+			-- when gap_y is close to zero and gap_y_motion is negative(This is not needed)
 			temp := ('0' & wall_y) + (wall_y_motion(9) & wall_y_motion);
 			IF game_on = '0' THEN
 				wall_y <= CONV_STD_LOGIC_VECTOR(5, 10);
