@@ -12,7 +12,7 @@ ENTITY bat_n_ball IS
 		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		hits: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
+		bird_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
 		serve : IN STD_LOGIC; -- initiates serve
 		red : OUT STD_LOGIC;
 		green : OUT STD_LOGIC;
