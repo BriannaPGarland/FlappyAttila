@@ -12,7 +12,7 @@ ENTITY bat_n_ball IS
 		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		hits: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		bird_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
+		bird_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bird x position
 		serve : IN STD_LOGIC; -- initiates serve
 		red : OUT STD_LOGIC;
 		green : OUT STD_LOGIC;
@@ -22,21 +22,21 @@ END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
 	SIGNAL gapsize : INTEGER := 120; -- ball size in pixels
-	CONSTANT bat_w : INTEGER := 6; -- bat width in pixels
-	CONSTANT bat_h : INTEGER := 6; -- bat height in pixels
+	CONSTANT bird_w : INTEGER := 6; -- bird width in pixels
+	CONSTANT bird_h : INTEGER := 6; -- bird height in pixels
 	CONSTANT wall_h : INTEGER := 65; -- thickness of the wall
 	SIGNAL score : integer :=0; -- score;+1for each wall passed
 	-- distance ball moves each frame
 	SIGNAL ball_speed : STD_LOGIC_VECTOR (9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 10);
 	SIGNAL wall_on : STD_LOGIC; -- indicates whether wall is at current pixel position
-	SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
+	SIGNAL bird_on : STD_LOGIC; -- indicates whether bird at over current pixel position
 	signal building_on : std_logic;
 	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether ball is in play
 	-- current ball position - intitialized to center of screen
 	SIGNAL gap_x : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
 	SIGNAL wall_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
 	-- bird = bat  vertical position
-	CONSTANT bat_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
+	CONSTANT bird_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
 	-- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
 	--boundary on the gap
 	SIGNAL wall_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := ball_speed;
@@ -47,7 +47,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     --signal duck_y : integer := 150; --initial duck y position
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
 BEGIN
-	red <= NOT bat_on;   -- color setup for red ball and cyan bat on white background	
+	red <= NOT bird_on;   -- color setup for red ball and cyan bird on white background	
 	green <= NOT wall_on;
 	blue <= NOT wall_on AND building_on;
 	-- process to draw gap
