@@ -79,19 +79,19 @@ BEGIN
 		END IF;
 	END PROCESS;
 	
-	--process to draw bat
-    -- set bat_on if current pixel address is covered by bat position
-	batdraw : PROCESS (bat_x, pixel_row, pixel_col) IS
+	--process to draw bird
+    -- set bird_on if current pixel address is covered by bird position
+	birddraw : PROCESS (bird_x, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	
 	BEGIN
-		IF ((pixel_row >= bat_x - bat_w) OR (bat_x <= bat_w)) AND
-		 pixel_row <= bat_x + bat_w AND
-			 pixel_col >= bat_y - bat_h AND
-			 pixel_col <= bat_y + bat_h THEN
-				bat_on <= '1';
+		IF ((pixel_row >= bird_x - bird_w) OR (bird_x <= bird_w)) AND
+		 pixel_row <= bird_x + bird_w AND
+			 pixel_col >= bird_y - bird_h AND
+			 pixel_col <= bird_y + bird_h THEN
+				bird_on <= '1';
 		ELSE
-			bat_on <= '0';
+			bird_on <= '0';
 	   END IF;
 	END PROCESS;
 	
@@ -141,16 +141,16 @@ BEGIN
 				flag<=0;
 			END IF;
 			-- landed within the gap
-			IF wall_y <= bat_y + bat_h/2 AND
-			 wall_y >= bat_y - bat_h/2 THEN
-                IF (bat_x + bat_w/2) <= (gap_x + gapsize/2) AND
-                 (bat_x - bat_w/2) >= (gap_x - gapsize/2) Then
+			IF wall_y <= bird_y + bird_h/2 AND
+			 wall_y >= bird_y - bird_h/2 THEN
+                IF (bird_x + bird_w/2) <= (gap_x + gapsize/2) AND
+                 (bird_x - bird_w/2) >= (gap_x - gapsize/2) Then
                     score <= score+1;
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
                      -- ball_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
-                     --(bat_y + bat_h/2) >= (wall_y - wall_h) AND
-                     --(bat_y - bat_h/2) <= (wall_y + wall_h) THEN
+                     --(bird_y + bird_h/2) >= (wall_y - wall_h) AND
+                     --(bird_y - bird_h/2) <= (wall_y + wall_h) THEN
                      --nothing, it's all good   
                 ELSE
                 -- hit the wall you lose
