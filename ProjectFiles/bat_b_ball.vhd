@@ -47,7 +47,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     --signal duck_y : integer := 150; --initial duck y position
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
 BEGIN
-	red <= NOT bat_on;   -- color setup for red ball and cyan bat on white background	
+	red <=  NOT bat_on;   -- color setup for red ball and cyan bat on white background	
 	green <= NOT wall_on;
 	blue <= NOT wall_on AND building_on;
 	-- process to draw gap
@@ -70,12 +70,14 @@ BEGIN
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
         IF ((pixel_row < gap_x - gapsize/2) OR (gap_x > gapsize/2)) AND
-		 pixel_row > gap_x + gapsize/2 AND
+		( pixel_row > gap_x + gapsize/2 OR 
+		 pixel_row < gap_x + gapsize/2)  AND
 			 pixel_col >= wall_y - wall_h AND
 			 pixel_col <= wall_y + wall_h THEN
 				building_on <= '1';
 		ELSE
 			building_on <= '0';
+		
 		END IF;
 	END PROCESS;
 	
@@ -103,33 +105,18 @@ BEGIN
 			WAIT UNTIL rising_edge(v_sync);
 			IF serve = '1' AND game_on = '0' THEN -- test for new serve
 			    score<=0;
+			    hitcount<= hitcount-hitcount;
 			    gapsize<=120;
 			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 				game_on <= '1';
 				wall_y_motion <= (ball_speed); -- set vspeed to (- ball_speed) pixels
-		--	ELSIF 
-			--wall_y + wall_h/2 >= 480 THEN -- if ball meets bottom wall
-			    --IF flag=0 THEN
-			   -- score <= score+1;
-			   -- flag <=1;
-			 -- END IF;
-			    --gapsize is decreased and speed is increased;
-			    --if '=' doesn't work try '<' and work from 5 to 15 to 25
-			    --IF score=5 THEN
-			    --    gapsize<=70;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
-			    --ELSIF score=15 THEN
-			    --    gapsize<=60;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
-			    --ELSIF score=25 THEN
-			    --    gapsize<=50;
-			    --    ball_speed<=CONV_STD_LOGIC_VECTOR (6, 10);
-			    --END IF;
-			    --wall_y_motion<=ball_speed;
-			    --get a new x-position for the gap with each reset
-			    --x <=((abs(320-x))+(123*(score**2)) mod 560)+40;
-			    --trying without the initial abs(320-x);
-			    --This somehow creates a random number, don't ask me how
+			ELSIF 
+		      wall_y + wall_h/2 >= 900 THEN -- if ball meets bottom wall
+			    IF flag=0 THEN
+			    score <= score+1;
+			    flag <=1;
+			  END IF;  
+			    
 			    x <=((123*(score**2)) mod 560)+40;
 			    IF x<40 THEN
 			    x <=40;
@@ -138,16 +125,19 @@ BEGIN
 			    END IF;
 			    gap_x <= CONV_STD_LOGIC_VECTOR(x, 10);
 				wall_y <= CONV_STD_LOGIC_VECTOR(5, 10);
-				flag<=0;
+			    flag <=0;
+				
+				
 			END IF;
 			-- landed within the gap
 			IF wall_y <= bat_y + bat_h/2 AND
 			 wall_y >= bat_y - bat_h/2 THEN
                 IF (bat_x + bat_w/2) <= (gap_x + gapsize/2) AND
                  (bat_x - bat_w/2) >= (gap_x - gapsize/2) Then
-                    score <= score+1;
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
+                 
+                        
                      -- ball_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
                      --(bat_y + bat_h/2) >= (wall_y - wall_h) AND
                      --(bat_y - bat_h/2) <= (wall_y + wall_h) THEN
@@ -156,7 +146,11 @@ BEGIN
                 -- hit the wall you lose
            
                 game_on <= '0';
-                gap_x <= CONV_STD_LOGIC_VECTOR(320, 10);
+                score <= 0;
+                hitcount <= hitcount-hitcount;
+                
+			    gap_x <= CONV_STD_LOGIC_VECTOR(x, 10);
+			    
                 gapsize<=120;
 			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
 			    wall_y_motion<=ball_speed;
