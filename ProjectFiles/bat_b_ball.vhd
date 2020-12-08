@@ -13,7 +13,7 @@ ENTITY bat_n_ball IS
 		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		hits: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
+		bird_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bird x position
 		serve : IN STD_LOGIC; -- initiates serve
 		red : OUT STD_LOGIC;
 		green : OUT STD_LOGIC;
@@ -23,21 +23,21 @@ END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
 	SIGNAL gapsize : INTEGER := 120; -- gap size in pixels
-	CONSTANT bat_w : INTEGER := 6; -- bat width in pixels
-	CONSTANT bat_h : INTEGER := 6; -- bat height in pixels
+	CONSTANT bird_w : INTEGER := 6; -- bird width in pixels
+	CONSTANT bird_h : INTEGER := 6; -- bird height in pixels
 	CONSTANT bound_h : INTEGER := 65; -- thickness of the bound
 	SIGNAL score : integer :=0; -- score;+1for each bound passed
 	-- distance gap moves each frame
 	SIGNAL gap_speed : STD_LOGIC_VECTOR (9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 10);
 	SIGNAL bound_on : STD_LOGIC; -- indicates whether bound is at current pixel position
-	SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
+	SIGNAL bird_on : STD_LOGIC; -- indicates whether bird at over current pixel position
 	signal building_on : std_logic;
 	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether gap is in play
 	-- current gap position - intitialized to center of screen
 	SIGNAL gap_pos : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
 	SIGNAL bound_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
-	-- bird = bat  vertical position
-	CONSTANT bat_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
+	-- bird = bird  vertical position
+	CONSTANT bird_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
 	-- current gap motion - initialized to (+ gap_speed) pixels/frame in both X and Y directions
 	--boundary on the gap
 	SIGNAL bound_y_motion : STD_LOGIC_VECTOR(9 DOWNTO 0) := gap_speed;
@@ -48,7 +48,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     --signal duck_y : integer := 150; --initial duck y position
     --signal duck_top, duck_bottom, duck_left, duck_right : integer := 0; 
 BEGIN
-	red <=  NOT bat_on;   -- color setup for red gap and cyan bat on white background	
+	red <=  NOT bird_on;   -- color setup for red gap and cyan bird on white background	
 	green <= NOT bound_on;
 	blue <= NOT bound_on AND building_on;
 	-- process to draw gap
@@ -82,19 +82,19 @@ BEGIN
 		END IF;
 	END PROCESS;
 	
-	--process to draw bat
-    -- set bat_on if current pixel address is covered by bat position
-	batdraw : PROCESS (bat_x, pixel_row, pixel_col) IS
+	--process to draw bird
+    -- set bird_on if current pixel address is covered by bird position
+	birddraw : PROCESS (bird_x, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	
 	BEGIN
-		IF ((pixel_row >= bat_x - bat_w) OR (bat_x <= bat_w)) AND
-		 pixel_row <= bat_x + bat_w AND
-			 pixel_col >= bat_y - bat_h AND
-			 pixel_col <= bat_y + bat_h THEN
-				bat_on <= '1';
+		IF ((pixel_row >= bird_x - bird_w) OR (bird_x <= bird_w)) AND
+		 pixel_row <= bird_x + bird_w AND
+			 pixel_col >= bird_y - bird_h AND
+			 pixel_col <= bird_y + bird_h THEN
+				bird_on <= '1';
 		ELSE
-			bat_on <= '0';
+			bird_on <= '0';
 	   END IF;
 	END PROCESS;
 	
@@ -131,17 +131,17 @@ BEGIN
 				
 			END IF;
 			-- landed within the gap
-			IF bound_y <= bat_y + bat_h/2 AND
-			 bound_y >= bat_y - bat_h/2 THEN
-                IF (bat_x + bat_w/2) <= (gap_pos + gapsize/2) AND
-                 (bat_x - bat_w/2) >= (gap_pos - gapsize/2) Then
+			IF bound_y <= bird_y + bird_h/2 AND
+			 bound_y >= bird_y - bird_h/2 THEN
+                IF (bird_x + bird_w/2) <= (gap_pos + gapsize/2) AND
+                 (bird_x - bird_w/2) >= (gap_pos - gapsize/2) Then
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
                  
                         
                      -- gap_speed<=CONV_STD_LOGIC_VECTOR (0, 10);
-                     --(bat_y + bat_h/2) >= (bound_y - bound_h) AND
-                     --(bat_y - bat_h/2) <= (bound_y + bound_h) THEN
+                     --(bird_y + bird_h/2) >= (bound_y - bound_h) AND
+                     --(bird_y - bird_h/2) <= (bound_y + bound_h) THEN
                      --nothing, it's all good   
                 ELSE
                 -- hit the bound you lose
