@@ -3,7 +3,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-ENTITY pong IS
+ENTITY flappy IS
     PORT (
         clk_in : IN STD_LOGIC; -- system clock
         VGA_red : OUT STD_LOGIC_VECTOR (3 DOWNTO 0); -- VGA outputs
@@ -20,9 +20,9 @@ ENTITY pong IS
         SEG7_SEG : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
         
     btn0 : IN STD_LOGIC); -- button to initiate serve
-END pong;
+END flappy;
 
-ARCHITECTURE Behavioral OF pong IS
+ARCHITECTURE Behavioral OF flappy IS
     SIGNAL pxl_clk : STD_LOGIC := '0'; -- 25 MHz clock to VGA sync module
     -- internal signals to connect modules
     SIGNAL S_red, S_green, S_blue : STD_LOGIC; --_VECTOR (3 DOWNTO 0);
