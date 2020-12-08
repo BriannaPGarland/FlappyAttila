@@ -1,6 +1,7 @@
 --bat_n_ball final draft
 -- bird = bat
---ball = gap
+-- ball = gap
+-- wall = bound
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
@@ -33,7 +34,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
 	signal building_on : std_logic;
 	SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether ball is in play
 	-- current ball position - intitialized to center of screen
-	SIGNAL gap_x : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
+	SIGNAL gap_pos : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(640, 10);
 	SIGNAL wall_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(5, 10);-- might need to mess around with the height
 	-- bird = bat  vertical position
 	CONSTANT bat_y : STD_LOGIC_VECTOR(9 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 10);
@@ -52,11 +53,11 @@ BEGIN
 	blue <= NOT wall_on AND building_on;
 	-- process to draw gap
 	-- set ball_on if current pixel address is covered by ball position
-	balldraw : PROCESS (wall_y, gap_x, pixel_row, pixel_col) IS
+	balldraw : PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
-        IF ((pixel_row >= gap_x - gapsize/2) OR (gap_x <= gapsize/2)) AND
-		 pixel_row <= gap_x + gapsize/2 AND
+        IF ((pixel_row >= gap_pos - gapsize/2) OR (gap_pos <= gapsize/2)) AND
+		 pixel_row <= gap_pos + gapsize/2 AND
 			 pixel_col >= wall_y - wall_h AND
 			 pixel_col <= wall_y + wall_h THEN
 				wall_on <= '1';
@@ -66,12 +67,12 @@ BEGIN
 	END PROCESS;
 	
 	--process to draw the buildings
-	buldingdraw: PROCESS (wall_y, gap_x, pixel_row, pixel_col) IS
+	buldingdraw: PROCESS (wall_y, gap_pos, pixel_row, pixel_col) IS
 		VARIABLE vx, vy : STD_LOGIC_VECTOR (9 DOWNTO 0);
 	BEGIN
-        IF ((pixel_row < gap_x - gapsize/2) OR (gap_x > gapsize/2)) AND
-		( pixel_row > gap_x + gapsize/2 OR 
-		 pixel_row < gap_x + gapsize/2)  AND
+        IF ((pixel_row < gap_pos - gapsize/2) OR (gap_pos > gapsize/2)) AND
+		( pixel_row > gap_pos + gapsize/2 OR 
+		 pixel_row < gap_pos + gapsize/2)  AND
 			 pixel_col >= wall_y - wall_h AND
 			 pixel_col <= wall_y + wall_h THEN
 				building_on <= '1';
@@ -123,7 +124,7 @@ BEGIN
 			    ELSIF x>600 THEN
 			    x <=600;
 			    END IF;
-			    gap_x <= CONV_STD_LOGIC_VECTOR(x, 10);
+			    gap_pos <= CONV_STD_LOGIC_VECTOR(x, 10);
 				wall_y <= CONV_STD_LOGIC_VECTOR(5, 10);
 			    flag <=0;
 				
@@ -132,8 +133,8 @@ BEGIN
 			-- landed within the gap
 			IF wall_y <= bat_y + bat_h/2 AND
 			 wall_y >= bat_y - bat_h/2 THEN
-                IF (bat_x + bat_w/2) <= (gap_x + gapsize/2) AND
-                 (bat_x - bat_w/2) >= (gap_x - gapsize/2) Then
+                IF (bat_x + bat_w/2) <= (gap_pos + gapsize/2) AND
+                 (bat_x - bat_w/2) >= (gap_pos - gapsize/2) Then
                     hitcount <= hitcount+1;
                     hits <= hitcount; 
                  
@@ -149,7 +150,7 @@ BEGIN
                 score <= 0;
                 hitcount <= hitcount-hitcount;
                 
-			    gap_x <= CONV_STD_LOGIC_VECTOR(x, 10);
+			    gap_pos <= CONV_STD_LOGIC_VECTOR(x, 10);
 			    
                 gapsize<=120;
 			    ball_speed<=CONV_STD_LOGIC_VECTOR (5, 10);
