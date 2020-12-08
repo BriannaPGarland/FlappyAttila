@@ -45,7 +45,7 @@ ARCHITECTURE Behavioral OF pong IS
             data_2 : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
         );
     END COMPONENT;
-    COMPONENT flappy IS
+    COMPONENT bird_n_buildings IS
         PORT (
             v_sync : IN STD_LOGIC;
             pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
@@ -114,7 +114,7 @@ BEGIN
         data_1 => OPEN, 
         data_2 => adout 
     );
-    add_bb : flappy
+    add_bb : bird_n_buildings
     PORT MAP(--instantiate bird and ball component
         v_sync => S_vsync, 
         pixel_row => S_pixel_row, 
