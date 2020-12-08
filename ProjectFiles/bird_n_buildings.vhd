@@ -1,4 +1,4 @@
--- flappy final draft
+-- bird_n_buildings final draft
 -- bird = bat
 -- ball = gap
 -- wall = bound
@@ -7,7 +7,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-ENTITY flappy IS
+ENTITY bird_n_buildings IS
 	PORT (
 		v_sync : IN STD_LOGIC;
 		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
@@ -19,9 +19,9 @@ ENTITY flappy IS
 		green : OUT STD_LOGIC;
 		blue : OUT STD_LOGIC
 	);
-END flappy;
+END bird_n_buildings;
 
-ARCHITECTURE Behavioral OF flappy IS
+ARCHITECTURE Behavioral OF bird_n_buildings IS
 	SIGNAL gapsize : INTEGER := 120; -- gap size in pixels
 	CONSTANT bird_w : INTEGER := 6; -- bird width in pixels
 	CONSTANT bird_h : INTEGER := 6; -- bird height in pixels
