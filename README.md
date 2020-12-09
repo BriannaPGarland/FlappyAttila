@@ -12,7 +12,10 @@ This is our final project for ***CPE 487 Digital System Design*** taught by Prof
 
 ## Features
 
-*WIP*
+ - Similar to lab 3 and lab 6 the "ball" or in our case Attila will be able to be controlled by the potentiometer to go up and down on the screen 
+ - Randomly generated obstacles that Attila cannot run into or the game is over  
+ - Score tracking system
+ - Infinitely continuous background
 
 ## Hardware Requirements and Installation
 
@@ -34,3 +37,4 @@ Huge thanks goes to our professor, Kevin Lu for teaching us, answering our quest
  - Michael Shusta
  - Jack Hymowitz
  - Jayden Pereira
+ - Dominic Zecchino
