@@ -23,7 +23,17 @@ This is our final project for ***CPE 487 Digital System Design*** taught by Prof
 
 ## How to use
 
-*WIP*
+*Controls:*
+
+Use the potentiometer to control Attila as you navigate your way through the pipes
+
+*Objective:*
+
+Score points by succesffully getting through a pipe, the more pipes the higher score
+
+*Winning:*
+
+Score 15 times and restart to see how many you can win in a row!
 
 ## Credits
 
