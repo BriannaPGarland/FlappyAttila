@@ -8,7 +8,7 @@ This is our final project for ***CPE 487 Digital System Design*** taught by Prof
 
 ## Screenshots
 
-![Gif of our demo](https://media.giphy.com/media/Lch5sqhD1AYZjk0nNj/giphy.gif)
+![gif of demo](https://user-images.githubusercontent.com/43273809/102029876-481d8580-3d7e-11eb-859a-6b5599f8a25c.gif)
 
 ## Features
 
