@@ -8,7 +8,13 @@ This is our final project for ***CPE 487 Digital System Design*** taught by Prof
 
 ## Screenshots
 
+**Demo:**
+
 ![gif of demo](https://user-images.githubusercontent.com/43273809/102029876-481d8580-3d7e-11eb-859a-6b5599f8a25c.gif)
+
+**Closer look at Attila:**
+
+![gif of Attila](https://user-images.githubusercontent.com/43273809/102033661-fe3a9c80-3d89-11eb-8654-2acf6f7ce174.gif)
 
 ## Features
 
@@ -16,10 +22,14 @@ This is our final project for ***CPE 487 Digital System Design*** taught by Prof
  - Randomly generated obstacles that Attila cannot run into or the game is over  
  - Score tracking system
  - Infinitely continuous background
+ - Attila sprite
 
-## Hardware Requirements and Installation
+## Hardware Requirements
 
-*WIP*
+- Nexus A7 100T FPGA Board
+- PMOD ADC1
+- 5kΩ Petentiometer
+- 600x800 resolution screen *(Disclaimer: game may not be playable outside of tested resolution)*
 
 ## How to use
 
